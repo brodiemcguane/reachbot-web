@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ReachBot Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060608;--bg2:#0e0e12;--bg3:#16161d;--bg4:#1e1e27;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#f0f0f4;--muted:#7a7a8c;--dim:#2e2e3a;
+  --green:#00e5a0;--gdim:rgba(0,229,160,0.1);--gglow:rgba(0,229,160,0.18);
+  --amber:#f5c842;--blue:#4a9eff;--red:#ff5757;
+  --font:'DM Sans',sans-serif;--display:'Syne',sans-serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6}
+a{color:inherit;text-decoration:none}
+button{font-family:var(--font);cursor:pointer}
+
+/* ── SHELL ── */
+.shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+@media(max-width:768px){.shell{grid-template-columns:1fr}}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:0;display:flex;flex-direction:column}
+@media(max-width:768px){.sidebar{display:none}}
+.sidebar-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.logo-mark{font-size:16px;color:var(--green)}
+.logo-text{font-family:var(--display);font-size:16px;font-weight:800;letter-spacing:-0.02em}
+.nav-section{padding:12px 12px 4px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;margin:1px 8px;font-size:13px;color:var(--muted);cursor:pointer;transition:all .12s;border:none;background:none;width:calc(100% - 16px);text-align:left}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--gdim);color:var(--green);font-weight:500}
+.nav-item-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.sidebar-bottom{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
+.live-badge{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--bg2)}
+.topbar-title{font-family:var(--display);font-size:17px;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.btn-sm{padding:7px 14px;font-size:12px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--text);transition:all .12s}
+.btn-sm:hover{background:var(--bg3)}
+.btn-sm-green{background:var(--green);color:#000;border-color:var(--green);font-weight:600}
+.btn-sm-green:hover{opacity:.88}
+
+/* ── MAIN ── */
+.main{display:flex;flex-direction:column;overflow:hidden}
+.content{padding:24px;overflow-y:auto;flex:1}
+
+/* ── PANELS ── */
+.panel{display:none}.panel.active{display:block}
+
+/* ── STATS ── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px}
+.stat-val{font-family:var(--display);font-size:28px;font-weight:800;letter-spacing:-0.04em;line-height:1}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:4px}
+.stat-trend{font-size:11px;margin-top:6px}
+.trend-up{color:var(--green)}.trend-dn{color:var(--red)}
+.stat-green .stat-val{color:var(--green)}
+.stat-amber .stat-val{color:var(--amber)}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.card-title{font-family:var(--display);font-size:14px;font-weight:700}
+.card-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.card2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.card2{grid-template-columns:1fr}}
+
+/* ── ACTIVITY LOG ── */
+.log-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.log-item:last-child{border-bottom:none}
+.log-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.dg{background:var(--green)}.da{background:var(--amber)}.db{background:var(--blue)}.dr{background:var(--red)}
+.log-time{font-size:11px;color:var(--muted);margin-top:2px}
+.badge{display:inline-block;font-size:10px;padding:1px 7px;border-radius:100px;font-weight:500}
+.bg{background:rgba(0,229,160,.12);color:var(--green)}
+.ba{background:rgba(245,200,66,.12);color:var(--amber)}
+.bb{background:rgba(74,158,255,.12);color:var(--blue)}
+.br{background:rgba(255,87,87,.12);color:var(--red)}
+.bgray{background:var(--bg4);color:var(--muted)}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;font-size:10px;font-weight:700;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.06em}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg3)}
+
+/* ── FORMS ── */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:500}
+input,textarea,select{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;outline:none;transition:border-color .15s}
+input:focus,textarea:focus,select:focus{border-color:rgba(0,229,160,.5)}
+textarea{resize:vertical;line-height:1.6}
+select option{background:var(--bg3)}
+.row2f{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;font-size:13px;font-weight:500;border:1px solid var(--border2);border-radius:7px;background:transparent;color:var(--text);cursor:pointer;transition:all .12s}
+.btn:hover{background:var(--bg3)}
+.btn-green{background:var(--green);color:#000;border-color:var(--green);font-weight:600}
+.btn-green:hover{opacity:.88}
+
+/* ── TOGGLE ── */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.tgl-label{font-size:13px;font-weight:500}
+.tgl-desc{font-size:12px;color:var(--muted);margin-top:1px}
+.tgl{width:36px;height:20px;background:var(--bg4);border:1px solid var(--border2);border-radius:10px;position:relative;cursor:pointer;transition:.2s;flex-shrink:0}
+.tgl.on{background:var(--green);border-color:var(--green)}
+.tgl-knob{width:14px;height:14px;background:var(--muted);border-radius:50%;position:absolute;top:2px;left:2px;transition:.2s}
+.tgl.on .tgl-knob{left:18px;background:#000}
+
+/* ── SEQ STEPS ── */
+.seq-step{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
+.seq-step:last-child{border-bottom:none}
+.seq-n{width:24px;height:24px;border-radius:50%;background:var(--gdim);border:1px solid rgba(0,229,160,.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);flex-shrink:0;margin-top:2px}
+.seq-ta{width:100%;font-size:12px;padding:8px 10px;min-height:60px;margin-top:6px}
+
+/* ── WEBHOOK BOX ── */
+.webhook-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.webhook-label{font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
+.webhook-row{display:flex;align-items:center;gap:8px}
+.webhook-url{font-size:12px;flex:1;font-family:monospace;color:var(--text);background:transparent;border:none;outline:none;padding:0}
+.webhook-copy{background:none;border:1px solid var(--border2);border-radius:5px;color:var(--muted);padding:4px 10px;font-size:11px;cursor:pointer;transition:all .12s;white-space:nowrap}
+.webhook-copy:hover{border-color:var(--green);color:var(--green)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--green);color:#000;font-weight:600;font-size:13px;padding:10px 18px;border-radius:8px;z-index:999;animation:toastIn .2s ease;pointer-events:none}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+.empty-icon{font-size:32px;margin-bottom:10px;opacity:.4}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-mark">◈</span>
+    <span class="logo-text">ReachBot</span>
+  </div>
+  <div style="padding:8px 0">
+    <div class="nav-section">Main</div>
+    <button class="nav-item active" onclick="nav('overview',this)"><span class="nav-item-icon">◉</span>Overview</button>
+    <button class="nav-item" onclick="nav('leads',this)"><span class="nav-item-icon">◎</span>Leads</button>
+    <button class="nav-item" onclick="nav('activity',this)"><span class="nav-item-icon">◈</span>Activity log</button>
+    <div class="nav-section">Automations</div>
+    <button class="nav-item" onclick="nav('missed',this)"><span class="nav-item-icon">◷</span>Missed call text</button>
+    <button class="nav-item" onclick="nav('followup',this)"><span class="nav-item-icon">◑</span>Follow-up sequence</button>
+    <button class="nav-item" onclick="nav('aibot',this)"><span class="nav-item-icon">◐</span>AI Q&amp;A bot</button>
+    <div class="nav-section">Account</div>
+    <button class="nav-item" onclick="nav('settings',this)"><span class="nav-item-icon">◧</span>Settings</button>
+    <button class="nav-item" onclick="nav('webhooks',this)"><span class="nav-item-icon">◫</span>Webhooks</button>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="live-badge"><span class="live-dot"></span>System live</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px" id="bizNameSidebar">Loading...</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="pageTitle">Overview</div>
+    <div class="topbar-right">
+      <button class="btn-sm" onclick="fetchAll()">↺ Refresh</button>
+      <button class="btn-sm btn-sm-green" onclick="nav('leads',document.querySelector('[onclick*=leads]'))">+ Add lead</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="panel active" id="panel-overview">
+      <div class="stat-grid" id="statsGrid">
+        <div class="stat-card"><div class="stat-val">—</div><div class="stat-lbl">Loading...</div></div>
+      </div>
+      <div class="card2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Live activity</div><span style="font-size:11px;color:var(--muted)" id="activityCount"></span></div>
+          <div class="card-sub">Most recent automations</div>
+          <div id="activityFeed"><div class="empty"><div class="empty-icon">◈</div>No activity yet</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Recent leads</div></div>
+          <div class="card-sub">Latest contacts captured</div>
+          <div id="recentLeads"><div class="empty"><div class="empty-icon">◎</div>No leads yet</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEADS -->
+    <div class="panel" id="panel-leads">
+      <div class="card">
+        <div class="card-title">Add lead manually</div>
+        <div class="card-sub">Starts their follow-up sequence immediately</div>
+        <div class="row2f">
+          <div class="field"><label>Phone *</label><input type="tel" id="ld-phone" placeholder="+15131234567"/></div>
+          <div class="field"><label>Name</label><input type="text" id="ld-name" placeholder="Sarah K."/></div>
+        </div>
+        <div class="row2f">
+          <div class="field"><label>Email</label><input type="email" id="ld-email" placeholder="sarah@example.com"/></div>
+          <div class="field"><label>Source</label>
+            <select id="ld-source">
+              <option value="manual">Manual</option><option value="website">Website</option>
+              <option value="facebook">Facebook ad</option><option value="google">Google ad</option>
+              <option value="referral">Referral</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-green" onclick="addLead()">Add lead + start follow-up</button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap" id="leadFilters">
+          <button class="btn-sm active-filter" onclick="filterLeads('all',this)">All</button>
+          <button class="btn-sm" onclick="filterLeads('new',this)">New</button>
+          <button class="btn-sm" onclick="filterLeads('replied',this)">Replied</button>
+          <button class="btn-sm" onclick="filterLeads('converted',this)">Converted</button>
+          <button class="btn-sm" onclick="filterLeads('opted-out',this)">Opted out</button>
+        </div>
+        <div id="leadsTable"></div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY -->
+    <div class="panel" id="panel-activity">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+          <div class="card-title">Full activity log</div>
+          <div class="card-sub" style="margin-bottom:0">Every automation that has fired</div>
+        </div>
+        <div id="fullActivity" style="padding:0 20px"></div>
+      </div>
+    </div>
+
+    <!-- MISSED CALL -->
+    <div class="panel" id="panel-missed">
+      <div class="card">
+        <div class="card-title">Missed call auto-text</div>
+        <div class="card-sub">Fires instantly when a call goes unanswered</div>
+        <div id="missedToggles"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Message template</div>
+        <div class="card-sub">Variables: <code>{business_name}</code> <code>{booking_line}</code> <code>{booking_url}</code></div>
+        <div class="field"><textarea id="missedTmpl" rows="4" oninput="updateMissedPreview()"></textarea></div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Preview</div>
+        <div style="background:var(--bg3);border-radius:8px;padding:14px">
+          <div style="background:var(--bg4);border-radius:12px 12px 12px 2px;padding:10px 14px;font-size:13px;line-height:1.6;display:inline-block;max-width:85%" id="missedPreview">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px" id="missedCharCount">0 chars</div>
+        </div>
+        <div style="margin-top:14px"><button class="btn btn-green" onclick="saveMissed()">Save template</button></div>
+      </div>
+    </div>
+
+    <!-- FOLLOW-UP -->
+    <div class="panel" id="panel-followup">
+      <div class="card">
+        <div class="card-title">Follow-up sequence</div>
+        <div class="card-sub">Auto-texts leads on a schedule · stops when they reply</div>
+        <div id="seqSteps"></div>
+        <div style="margin-top:14px"><button class="btn btn-green" onclick="saveSequence()">Save sequence</button></div>
+      </div>
+    </div>
+
+    <!-- AI BOT -->
+    <div class="panel" id="panel-aibot">
+      <div class="card">
+        <div class="card-title">AI auto-reply</div>
+        <div class="card-sub">Answers inbound texts using your business knowledge base</div>
+        <div id="aiToggles"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Business knowledge base</div>
+        <div class="card-sub">What the AI knows about your business</div>
+        <div class="field"><label>Business name</label><input type="text" id="ai-bizname"/></div>
+        <div class="row2f">
+          <div class="field"><label>Hours</label><input type="text" id="ai-hours" placeholder="Mon–Sat 7am–6pm"/></div>
+          <div class="field"><label>Booking URL</label><input type="text" id="ai-booking"/></div>
+        </div>
+        <div class="field"><label>Services</label><textarea id="ai-services" rows="2"></textarea></div>
+        <div class="field"><label>Pricing</label><textarea id="ai-pricing" rows="2"></textarea></div>
+        <div class="card-title" style="margin:16px 0 8px">Test the AI</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input type="text" id="ai-test-q" placeholder="Do you offer same-day service?" onkeydown="if(event.key==='Enter')testAI()"/>
+          <button class="btn btn-green" onclick="testAI()" style="white-space:nowrap" id="testBtn">Test</button>
+        </div>
+        <div id="ai-test-result" style="display:none;background:var(--bg3);border-radius:8px;padding:12px;font-size:13px"></div>
+        <div style="margin-top:14px"><button class="btn btn-green" onclick="saveAI()">Save knowledge base</button></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="panel" id="panel-settings">
+      <div class="card">
+        <div class="card-title">Business info</div>
+        <div class="card-sub">Core details used across all automations</div>
+        <div class="field"><label>Business name</label><input type="text" id="set-bizname"/></div>
+        <div class="row2f">
+          <div class="field"><label>Owner phone (alert texts)</label><input type="tel" id="set-ownerphone"/></div>
+          <div class="field"><label>Booking URL</label><input type="text" id="set-booking"/></div>
+        </div>
+        <div class="row2f">
+          <div class="field"><label>Opens at (24h)</label><input type="text" id="set-open" placeholder="7"/></div>
+          <div class="field"><label>Closes at (24h)</label><input type="text" id="set-close" placeholder="18"/></div>
+        </div>
+        <button class="btn btn-green" onclick="saveSettings()">Save settings</button>
+      </div>
+    </div>
+
+    <!-- WEBHOOKS -->
+    <div class="panel" id="panel-webhooks">
+      <div class="card">
+        <div class="card-title">Twilio webhook URLs</div>
+        <div class="card-sub">Paste these into console.twilio.com → Phone Numbers → your number</div>
+        <div class="webhook-box">
+          <div class="webhook-label">Voice — "A call comes in" → HTTP POST</div>
+          <div class="webhook-row">
+            <input class="webhook-url" type="text" id="wh-voice" readonly/>
+            <button class="webhook-copy" onclick="copyWebhook('wh-voice',this)">Copy</button>
+          </div>
+        </div>
+        <div class="webhook-box">
+          <div class="webhook-label">Messaging — "A message comes in" → HTTP POST</div>
+          <div class="webhook-row">
+            <input class="webhook-url" type="text" id="wh-sms" readonly/>
+            <button class="webhook-copy" onclick="copyWebhook('wh-sms',this)">Copy</button>
+          </div>
+        </div>
+        <div style="margin-top:16px">
+          <div class="card-title" style="margin-bottom:8px">Test connection</div>
+          <button class="btn" onclick="testHealth()">Check server health</button>
+          <div id="health-result" style="margin-top:10px;font-size:13px;color:var(--muted)"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Server URL</div>
+        <div class="card-sub">Update this if your Railway URL changes</div>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="api-url-input" placeholder="https://your-app.up.railway.app"/>
+          <button class="btn btn-green" onclick="updateApiUrl()" style="white-space:nowrap">Save & reconnect</button>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--muted)">Current: <span id="current-api-url"></span></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+// IMPORTANT: Change this to your Railway URL after deploying
+let API = localStorage.getItem('reachbot_api') || 'https://YOUR-APP.up.railway.app';
+
+let allLeads = [];
+let config = {};
+let currentFilter = 'all';
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+const PAGE_TITLES = {
+  overview:'Overview', leads:'Leads', activity:'Activity log',
+  missed:'Missed call text', followup:'Follow-up sequence',
+  aibot:'AI Q&A bot', settings:'Settings', webhooks:'Webhooks'
+};
+
+function nav(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  document.getElementById('pageTitle').textContent = PAGE_TITLES[id] || id;
+  if(id === 'overview') fetchAll();
+  if(id === 'leads') renderLeads();
+  if(id === 'activity') fetchActivity(100);
+  if(id === 'missed') loadMissed();
+  if(id === 'followup') loadFollowup();
+  if(id === 'aibot') loadAI();
+  if(id === 'settings') loadSettings();
+  if(id === 'webhooks') loadWebhooks();
+}
+
+// ── API HELPERS ───────────────────────────────────────────────────────────────
+async function apiFetch(path, opts={}) {
+  try {
+    const res = await fetch(API + path, {
+      headers: { 'Content-Type': 'application/json' },
+      ...opts
+    });
+    if (!res.ok) throw new Error(`${res.status}`);
+    return res.json();
+  } catch(e) {
+    console.error(path, e.message);
+    return null;
+  }
+}
+
+async function apiPost(path, body) {
+  return apiFetch(path, { method:'POST', body: JSON.stringify(body) });
+}
+
+// ── FETCH ALL ─────────────────────────────────────────────────────────────────
+async function fetchAll() {
+  const [stats, activity, leads, cfg] = await Promise.all([
+    apiFetch('/api/stats'),
+    apiFetch('/api/activity?limit=10'),
+    apiFetch('/api/leads'),
+    apiFetch('/api/config'),
+  ]);
+
+  if(stats) renderStats(stats);
+  if(activity) renderActivityFeed(activity);
+  if(leads) { allLeads = leads; renderRecentLeads(leads.slice(0,5)); }
+  if(cfg) { config = cfg; applyConfig(cfg); }
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function renderStats(s) {
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card stat-green">
+      <div class="stat-val">${s.missedCallsSent||0}</div>
+      <div class="stat-lbl">Missed calls texted</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">${s.followUpsSent||0}</div>
+      <div class="stat-lbl">Follow-ups sent</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">${s.aiReplies||0}</div>
+      <div class="stat-lbl">AI replies</div>
+    </div>
+    <div class="stat-card stat-amber">
+      <div class="stat-val">${s.converted||0}</div>
+      <div class="stat-lbl">Leads converted</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">${s.totalLeads||0}</div>
+      <div class="stat-lbl">Total leads</div>
+    </div>
+  `;
+}
+
+// ── ACTIVITY FEED ─────────────────────────────────────────────────────────────
+const TYPE_DOT = { 'missed-call':'dg','follow-up':'da','ai-reply':'db','human-handoff':'da','opt-out':'dr' };
+const STATUS_BADGE = { sent:'bg',delivered:'bg',replied:'bb',escalated:'ba','opted-out':'br',handled:'bgray' };
+
+function timeAgo(str) {
+  if(!str) return '';
+  const diff = Math.floor((Date.now() - new Date(str)) / 1000);
+  if(diff < 60) return 'just now';
+  if(diff < 3600) return `${Math.floor(diff/60)}m ago`;
+  if(diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+  return `${Math.floor(diff/86400)}d ago`;
+}
+
+function renderActivityFeed(items) {
+  const el = document.getElementById('activityFeed');
+  const count = document.getElementById('activityCount');
+  if(!items || !items.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">◈</div>No activity yet. Connect Twilio to get started.</div>';
+    return;
+  }
+  if(count) count.textContent = `${items.length} events`;
+  el.innerHTML = items.map(item => `
+    <div class="log-item">
+      <div class="log-dot ${TYPE_DOT[item.type]||'db'}"></div>
+      <div style="flex:1">
+        <div>${item.message||item.type}</div>
+        <div class="log-time">${timeAgo(item.createdAt)} · <span class="badge ${STATUS_BADGE[item.status]||'bgray'}">${item.status||'—'}</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function fetchActivity(limit=50) {
+  const items = await apiFetch(`/api/activity?limit=${limit}`);
+  const el = document.getElementById('fullActivity');
+  if(!items || !items.length) {
+    el.innerHTML = '<div class="empty" style="padding:32px"><div class="empty-icon">◈</div>No activity logged yet</div>';
+    return;
+  }
+  el.innerHTML = '<div style="padding:0 0">' + items.map(item => `
+    <div class="log-item">
+      <div class="log-dot ${TYPE_DOT[item.type]||'db'}"></div>
+      <div style="flex:1">
+        <div>${item.message||item.type}</div>
+        <div class="log-time">${timeAgo(item.createdAt)} · <span class="badge ${STATUS_BADGE[item.status]||'bgray'}">${item.status||'—'}</span></div>
+      </div>
+    </div>
+  `).join('') + '</div>';
+}
+
+// ── LEADS ─────────────────────────────────────────────────────────────────────
+const STATUS_BADGE_LEAD = { new:'bb', replied:'bg', converted:'bg', 'opted-out':'br', 'no-response':'bgray' };
+
+function renderRecentLeads(leads) {
+  const el = document.getElementById('recentLeads');
+  if(!leads || !leads.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">◎</div>No leads yet</div>';
+    return;
+  }
+  el.innerHTML = leads.map(l => `
+    <div class="log-item">
+      <div class="log-dot db"></div>
+      <div style="flex:1">
+        <div>${l.name||l.phone}</div>
+        <div class="log-time">${l.phone} · <span class="badge ${STATUS_BADGE_LEAD[l.status]||'bgray'}">${l.status}</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderLeads() {
+  const filtered = currentFilter === 'all' ? allLeads : allLeads.filter(l => l.status === currentFilter);
+  const el = document.getElementById('leadsTable');
+  if(!filtered.length) {
+    el.innerHTML = '<div class="empty" style="padding:32px"><div class="empty-icon">◎</div>No leads found</div>';
+    return;
+  }
+  el.innerHTML = `<table class="tbl">
+    <thead><tr><th>Phone</th><th>Name</th><th>Source</th><th>Status</th><th>Added</th></tr></thead>
+    <tbody>${filtered.map(l => `
+      <tr>
+        <td style="font-family:monospace;font-size:12px">${l.phone}</td>
+        <td>${l.name||'<span style="color:var(--muted)">—</span>'}</td>
+        <td><span class="badge bgray">${l.source||'—'}</span></td>
+        <td><span class="badge ${STATUS_BADGE_LEAD[l.status]||'bgray'}">${l.status}</span></td>
+        <td style="color:var(--muted);font-size:12px">${new Date(l.createdAt).toLocaleDateString()}</td>
+      </tr>
+    `).join('')}</tbody>
+  </table>`;
+}
+
+function filterLeads(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('#leadFilters .btn-sm').forEach(b => b.classList.remove('active-filter'));
+  btn.classList.add('active-filter');
+  renderLeads();
+}
+
+async function addLead() {
+  const phone = document.getElementById('ld-phone').value.trim();
+  if(!phone) { toast('Phone number is required'); return; }
+  const res = await apiPost('/api/leads', {
+    phone,
+    name: document.getElementById('ld-name').value.trim(),
+    email: document.getElementById('ld-email').value.trim(),
+    source: document.getElementById('ld-source').value,
+  });
+  if(res && res.success) {
+    toast('Lead added + follow-up started!');
+    document.getElementById('ld-phone').value = '';
+    document.getElementById('ld-name').value = '';
+    document.getElementById('ld-email').value = '';
+    const leads = await apiFetch('/api/leads');
+    if(leads) { allLeads = leads; renderLeads(); }
+  } else {
+    toast('Failed to add lead — is the server running?');
+  }
+}
+
+// ── MISSED CALL ───────────────────────────────────────────────────────────────
+function loadMissed() {
+  document.getElementById('missedTmpl').value = config.missedCallTemplate || '';
+  document.getElementById('missedToggles').innerHTML = `
+    <div class="toggle-row">
+      <div><div class="tgl-label">Enable missed call texting</div><div class="tgl-desc">Texts caller within seconds of a missed call</div></div>
+      <div class="tgl on"><div class="tgl-knob"></div></div>
+    </div>
+    <div class="toggle-row">
+      <div><div class="tgl-label">After-hours only</div><div class="tgl-desc">Only fire outside business hours</div></div>
+      <div class="tgl ${config.afterHoursOnly?'on':''}" onclick="this.classList.toggle('on')"><div class="tgl-knob"></div></div>
+    </div>
+    <div class="toggle-row">
+      <div><div class="tgl-label">Skip repeat callers</div><div class="tgl-desc">Don't re-text same number within 24h</div></div>
+      <div class="tgl ${config.skipRepeatCallers!==false?'on':''}" onclick="this.classList.toggle('on')"><div class="tgl-knob"></div></div>
+    </div>
+  `;
+  updateMissedPreview();
+}
+
+function updateMissedPreview() {
+  const tmpl = document.getElementById('missedTmpl')?.value || '';
+  const biz = config.businessName || 'Your Business';
+  const url = config.bookingUrl || '';
+  const preview = tmpl
+    .replace(/{business_name}/g, biz)
+    .replace(/{booking_url}/g, url)
+    .replace(/{booking_line}/g, url ? ` Book: ${url}` : '');
+  const el = document.getElementById('missedPreview');
+  const cnt = document.getElementById('missedCharCount');
+  if(el) el.textContent = preview || '—';
+  if(cnt) cnt.textContent = `${preview.length} chars`;
+}
+
+async function saveMissed() {
+  const tmpl = document.getElementById('missedTmpl').value;
+  const res = await apiPost('/api/config', { missedCallTemplate: tmpl });
+  if(res) { config.missedCallTemplate = tmpl; toast('Saved!'); }
+  else toast('Save failed — check server connection');
+}
+
+// ── FOLLOW-UP ─────────────────────────────────────────────────────────────────
+const DELAY_OPTS = [[0,'Immediately'],[60,'1 hour later'],[1440,'24 hours later'],[4320,'3 days later'],[7200,'5 days later'],[10080,'7 days later']];
+
+function loadFollowup() {
+  const steps = config.followUpSteps || [];
+  const el = document.getElementById('seqSteps');
+  if(!steps.length) {
+    el.innerHTML = '<div class="empty">No steps configured yet</div>';
+    return;
+  }
+  el.innerHTML = steps.map((s,i) => `
+    <div class="seq-step">
+      <div class="seq-n">${i+1}</div>
+      <div style="flex:1">
+        <select id="seq-delay-${i}" style="width:auto;font-size:12px;padding:5px 8px;margin-bottom:6px">
+          ${DELAY_OPTS.map(([v,l]) => `<option value="${v}" ${s.delay===v?'selected':''}>${l}</option>`).join('')}
+        </select>
+        <textarea class="seq-ta" id="seq-msg-${i}" rows="2">${s.message||''}</textarea>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">Variables: {first_name} {business_name} {booking_line}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function saveSequence() {
+  const steps = (config.followUpSteps||[]).map((_,i) => ({
+    delay: parseInt(document.getElementById(`seq-delay-${i}`)?.value || 0),
+    message: document.getElementById(`seq-msg-${i}`)?.value || '',
+  }));
+  const res = await apiPost('/api/config', { followUpSteps: steps });
+  if(res) { config.followUpSteps = steps; toast('Sequence saved!'); }
+  else toast('Save failed');
+}
+
+// ── AI BOT ────────────────────────────────────────────────────────────────────
+function loadAI() {
+  document.getElementById('ai-bizname').value = config.businessName || '';
+  document.getElementById('ai-hours').value = config.hours || '';
+  document.getElementById('ai-booking').value = config.bookingUrl || '';
+  document.getElementById('ai-services').value = config.services || '';
+  document.getElementById('ai-pricing').value = config.pricing || '';
+  document.getElementById('aiToggles').innerHTML = `
+    <div class="toggle-row">
+      <div><div class="tgl-label">Enable AI auto-replies</div><div class="tgl-desc">Responds to inbound texts in real time</div></div>
+      <div class="tgl ${config.aiEnabled!==false?'on':''}" onclick="this.classList.toggle('on')"><div class="tgl-knob"></div></div>
+    </div>
+    <div class="toggle-row">
+      <div><div class="tgl-label">Human handoff when unsure</div><div class="tgl-desc">Alerts you when AI confidence is low</div></div>
+      <div class="tgl ${config.humanHandoff!==false?'on':''}" onclick="this.classList.toggle('on')"><div class="tgl-knob"></div></div>
+    </div>
+  `;
+}
+
+async function testAI() {
+  const q = document.getElementById('ai-test-q').value.trim();
+  if(!q) return;
+  const btn = document.getElementById('testBtn');
+  btn.textContent = '...';
+  btn.disabled = true;
+  const res = await apiPost('/api/ai-test', { message: q });
+  const el = document.getElementById('ai-test-result');
+  el.style.display = 'block';
+  if(res) {
+    el.innerHTML = `<div style="font-size:11px;color:var(--muted);margin-bottom:6px">${res.confident?'✓ Confident reply':'⚠ Would escalate to human'}</div><div>${res.reply}</div>`;
+  } else {
+    el.innerHTML = `<span style="color:var(--red)">Could not reach server — make sure your Railway URL is set correctly in the Webhooks tab</span>`;
+  }
+  btn.textContent = 'Test';
+  btn.disabled = false;
+}
+
+async function saveAI() {
+  const updates = {
+    businessName: document.getElementById('ai-bizname').value,
+    hours: document.getElementById('ai-hours').value,
+    bookingUrl: document.getElementById('ai-booking').value,
+    services: document.getElementById('ai-services').value,
+    pricing: document.getElementById('ai-pricing').value,
+  };
+  const res = await apiPost('/api/config', updates);
+  if(res) { Object.assign(config, updates); toast('Knowledge base saved!'); }
+  else toast('Save failed');
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+function loadSettings() {
+  document.getElementById('set-bizname').value = config.businessName || '';
+  document.getElementById('set-ownerphone').value = config.ownerPhone || '';
+  document.getElementById('set-booking').value = config.bookingUrl || '';
+  document.getElementById('set-open').value = config.openHour || 7;
+  document.getElementById('set-close').value = config.closeHour || 18;
+  document.getElementById('bizNameSidebar').textContent = config.businessName || 'Not configured';
+}
+
+async function saveSettings() {
+  const updates = {
+    businessName: document.getElementById('set-bizname').value,
+    ownerPhone: document.getElementById('set-ownerphone').value,
+    bookingUrl: document.getElementById('set-booking').value,
+    openHour: parseInt(document.getElementById('set-open').value),
+    closeHour: parseInt(document.getElementById('set-close').value),
+  };
+  const res = await apiPost('/api/config', updates);
+  if(res) {
+    Object.assign(config, updates);
+    document.getElementById('bizNameSidebar').textContent = updates.businessName || 'ReachBot';
+    toast('Settings saved!');
+  } else toast('Save failed');
+}
+
+// ── WEBHOOKS TAB ──────────────────────────────────────────────────────────────
+function loadWebhooks() {
+  document.getElementById('wh-voice').value = API + '/webhook/missed-call';
+  document.getElementById('wh-sms').value = API + '/webhook/inbound-sms';
+  document.getElementById('api-url-input').value = API;
+  document.getElementById('current-api-url').textContent = API;
+}
+
+function copyWebhook(id, btn) {
+  const val = document.getElementById(id).value;
+  navigator.clipboard.writeText(val);
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy', 2000);
+}
+
+async function testHealth() {
+  const el = document.getElementById('health-result');
+  el.textContent = 'Checking...';
+  const res = await apiFetch('/health');
+  if(res) {
+    el.innerHTML = `<span style="color:var(--green)">✓ Server is online</span> · Uptime: ${Math.floor(res.uptime/60)}m · ${new Date(res.timestamp).toLocaleTimeString()}`;
+  } else {
+    el.innerHTML = `<span style="color:var(--red)">✗ Cannot reach server at ${API}</span><br><span style="font-size:12px">Make sure your Railway URL is correct and the server is deployed</span>`;
+  }
+}
+
+function updateApiUrl() {
+  const url = document.getElementById('api-url-input').value.trim().replace(/\/$/, '');
+  if(!url) return;
+  API = url;
+  localStorage.setItem('reachbot_api', url);
+  document.getElementById('current-api-url').textContent = url;
+  loadWebhooks();
+  toast('Server URL updated — testing connection...');
+  setTimeout(testHealth, 300);
+}
+
+// ── APPLY CONFIG ──────────────────────────────────────────────────────────────
+function applyConfig(cfg) {
+  document.getElementById('bizNameSidebar').textContent = cfg.businessName || 'ReachBot';
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg) {
+  const existing = document.querySelector('.toast');
+  if(existing) existing.remove();
+  clearTimeout(toastTimer);
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  toastTimer = setTimeout(() => el.remove(), 3000);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+fetchAll();
+setInterval(fetchAll, 15000); // live refresh every 15s
+</script>
+</body>
+</html>

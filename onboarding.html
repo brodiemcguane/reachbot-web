@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Get Started — ReachBot Setup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#060608;
+  --off:#0d0d10;
+  --card:#13131a;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.16);
+  --text:#f2f2f5;
+  --muted:#7a7a8c;
+  --dim:#2a2a36;
+  --green:#00e5a0;
+  --green-dim:rgba(0,229,160,0.1);
+  --green-glow:rgba(0,229,160,0.2);
+  --red:#ff5757;
+  --font-display:'Syne',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+}
+html,body{height:100%;background:var(--black);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6}
+
+/* ── LAYOUT ── */
+.shell{min-height:100vh;display:grid;grid-template-columns:380px 1fr}
+@media(max-width:800px){.shell{grid-template-columns:1fr;grid-template-rows:auto 1fr}}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--off);border-right:1px solid var(--border);padding:40px 36px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:hidden}
+@media(max-width:800px){.sidebar{height:auto;position:static;padding:24px;border-right:none;border-bottom:1px solid var(--border)}}
+.sidebar-logo{font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-0.03em;margin-bottom:48px}
+.sidebar-logo span{color:var(--green)}
+.steps-nav{flex:1}
+.step-nav-item{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .15s}
+.step-nav-item:last-child{border-bottom:none}
+.step-nav-item.inactive{opacity:.35}
+.step-nav-item.active{opacity:1}
+.step-nav-item.done{opacity:.7}
+.step-circle{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;font-family:var(--font-display);transition:all .2s}
+.step-nav-item.active .step-circle{border-color:var(--green);background:var(--green-dim);color:var(--green)}
+.step-nav-item.done .step-circle{border-color:var(--green);background:var(--green);color:#000}
+.step-nav-label{font-family:var(--font-display);font-size:13px;font-weight:700;margin-bottom:2px}
+.step-nav-desc{font-size:12px;color:var(--muted)}
+.sidebar-footer{margin-top:auto;padding-top:24px;font-size:12px;color:var(--muted);line-height:1.8}
+.sidebar-footer strong{color:var(--text);display:block;margin-bottom:4px}
+
+/* ── MAIN ── */
+.main{padding:56px 64px;max-width:680px}
+@media(max-width:1100px){.main{padding:40px 36px}}
+@media(max-width:800px){.main{padding:32px 24px;max-width:100%}}
+
+/* ── PROGRESS BAR ── */
+.progress-wrap{margin-bottom:48px}
+.progress-label{display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;color:var(--muted)}
+.progress-bar{height:3px;background:var(--dim);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+
+/* ── STEP PANELS ── */
+.step-panel{display:none;animation:stepIn .3s ease}
+.step-panel.active{display:block}
+@keyframes stepIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.step-eyebrow{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--green);margin-bottom:10px}
+.step-title{font-family:var(--font-display);font-size:clamp(26px,3.5vw,38px);font-weight:800;letter-spacing:-0.03em;line-height:1.1;margin-bottom:10px}
+.step-sub{font-size:15px;color:var(--muted);font-weight:300;margin-bottom:36px;max-width:440px}
+
+/* ── FORM ELEMENTS ── */
+.field{margin-bottom:20px}
+.field label{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:6px}
+.field label span{color:var(--red)}
+input[type=text],input[type=tel],input[type=email],input[type=url],textarea,select{
+  width:100%;background:var(--card);border:1px solid var(--border2);border-radius:8px;
+  color:var(--text);font-family:var(--font-body);font-size:15px;padding:12px 14px;
+  outline:none;transition:border-color .15s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--green)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+textarea{resize:vertical;min-height:90px;line-height:1.6}
+select option{background:var(--card)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:500px){.row2{grid-template-columns:1fr}}
+
+/* ── PLAN SELECTOR ── */
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+@media(max-width:600px){.plan-grid{grid-template-columns:1fr}}
+.plan-option{border:1.5px solid var(--border2);border-radius:10px;padding:18px;cursor:pointer;transition:all .15s;position:relative}
+.plan-option:hover{border-color:rgba(0,229,160,.35)}
+.plan-option.selected{border-color:var(--green);background:var(--green-dim)}
+.plan-option input[type=radio]{display:none}
+.plan-name{font-family:var(--font-display);font-size:14px;font-weight:700;margin-bottom:4px}
+.plan-price{font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-0.03em}
+.plan-price-per{font-size:12px;font-weight:400;color:var(--muted)}
+.plan-features{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.7}
+.plan-badge{position:absolute;top:-9px;right:12px;background:var(--green);color:#000;font-family:var(--font-display);font-size:10px;font-weight:700;padding:2px 10px;border-radius:100px}
+
+/* ── TEMPLATE BUILDER ── */
+.template-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.template-editor{padding:14px 16px}
+.template-editor textarea{border:none;background:transparent;padding:0;font-size:14px;min-height:80px}
+.template-editor textarea:focus{border:none;outline:none}
+.template-vars{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;border-top:1px solid var(--border)}
+.var-pill{font-size:11px;padding:3px 10px;background:var(--dim);border-radius:100px;color:var(--muted);cursor:pointer;font-family:monospace;transition:all .12s}
+.var-pill:hover{background:var(--green-dim);color:var(--green)}
+.preview-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-family:var(--font-display)}
+.sms-preview{background:var(--off);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.sms-bubble{background:var(--card);border-radius:14px 14px 14px 2px;padding:10px 14px;font-size:13px;line-height:1.6;display:inline-block;max-width:85%}
+.sms-meta{font-size:11px;color:var(--muted);margin-top:8px}
+
+/* ── SEQUENCE BUILDER ── */
+.seq-step{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border)}
+.seq-step:last-child{border-bottom:none}
+.seq-num-badge{width:28px;height:28px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(0,229,160,.25);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--green);flex-shrink:0;margin-top:2px}
+.seq-content{flex:1}
+.seq-delay-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.seq-delay-select{width:auto;font-size:12px;padding:5px 10px;background:var(--dim);border-color:transparent}
+.seq-textarea{font-size:13px;padding:9px 12px;min-height:68px}
+
+/* ── HOURS GRID ── */
+.hours-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:20px}
+.day-toggle{background:var(--card);border:1.5px solid var(--border2);border-radius:8px;padding:10px 4px;text-align:center;cursor:pointer;transition:all .15s}
+.day-toggle.on{border-color:var(--green);background:var(--green-dim)}
+.day-toggle-label{font-size:11px;font-weight:700;font-family:var(--font-display);color:var(--muted)}
+.day-toggle.on .day-toggle-label{color:var(--green)}
+
+/* ── QA BUILDER ── */
+.qa-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px}
+.qa-q input{font-size:13px;padding:8px 12px;margin-bottom:8px}
+.qa-a input{font-size:13px;padding:8px 12px;background:var(--off)}
+.qa-del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;float:right;margin-top:-4px;transition:color .12s;font-family:var(--font-body)}
+.qa-del-btn:hover{color:var(--red)}
+.add-qa-btn{width:100%;background:none;border:1.5px dashed var(--border2);border-radius:8px;padding:11px;color:var(--muted);cursor:pointer;font-size:13px;font-family:var(--font-body);transition:all .15s}
+.add-qa-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-dim)}
+
+/* ── NAV BUTTONS ── */
+.nav-buttons{display:flex;gap:12px;margin-top:36px;align-items:center}
+.btn{font-family:var(--font-display);font-weight:700;font-size:14px;padding:12px 28px;border-radius:8px;cursor:pointer;transition:all .15s;border:none}
+.btn-next{background:var(--green);color:#000}
+.btn-next:hover{opacity:.88;transform:translateY(-1px)}
+.btn-next:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-back{background:transparent;color:var(--muted);border:1px solid var(--border2)}
+.btn-back:hover{color:var(--text);border-color:var(--border2)}
+.btn-submit{background:var(--green);color:#000;font-size:16px;padding:14px 36px}
+.btn-submit:hover{opacity:.88}
+
+/* ── SUCCESS ── */
+.success-panel{display:none;text-align:center;padding-top:40px}
+.success-icon{font-size:64px;margin-bottom:24px;animation:popIn .4s cubic-bezier(.4,0,.2,1)}
+@keyframes popIn{0%{transform:scale(0.7)}70%{transform:scale(1.1)}100%{transform:scale(1)}}
+.success-title{font-family:var(--font-display);font-size:38px;font-weight:800;letter-spacing:-0.03em;margin-bottom:12px}
+.success-sub{font-size:17px;color:var(--muted);max-width:380px;margin:0 auto 32px;font-weight:300}
+.next-steps{text-align:left;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-top:28px}
+.next-steps h3{font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:16px;color:var(--green)}
+.next-step-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--muted)}
+.next-step-item:last-child{border-bottom:none}
+.next-step-num{width:22px;height:22px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(0,229,160,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Reach<span>Bot</span></div>
+    <div class="steps-nav" id="stepsNav">
+      <!-- Populated by JS -->
+    </div>
+    <div class="sidebar-footer">
+      <strong>Setup takes about 10 minutes</strong>
+      After completing these steps, your automations go live immediately. You'll get a confirmation email with your webhook URLs.
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="progressLabel">Step 1 of 6</span>
+        <span id="progressPct">17%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:17%"></div></div>
+    </div>
+
+    <!-- STEP 1: Plan -->
+    <div class="step-panel active" id="step-1">
+      <div class="step-eyebrow">Get started</div>
+      <h1 class="step-title">Choose your plan</h1>
+      <p class="step-sub">Pick the automations that fit your business. You can upgrade anytime.</p>
+      <div class="plan-grid">
+        <label class="plan-option" id="plan-starter">
+          <input type="radio" name="plan" value="starter"/>
+          <div class="plan-name">Starter</div>
+          <div class="plan-price">$197<span class="plan-price-per">/mo</span></div>
+          <div class="plan-features">Missed call texts only · Up to 300 texts/mo</div>
+        </label>
+        <label class="plan-option selected" id="plan-growth">
+          <div class="plan-badge">Popular</div>
+          <input type="radio" name="plan" value="growth" checked/>
+          <div class="plan-name">Growth</div>
+          <div class="plan-price">$397<span class="plan-price-per">/mo</span></div>
+          <div class="plan-features">Missed call + follow-up sequences · 1,000 texts/mo</div>
+        </label>
+        <label class="plan-option" id="plan-pro">
+          <input type="radio" name="plan" value="pro"/>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">$697<span class="plan-price-per">/mo</span></div>
+          <div class="plan-features">All automations + AI Q&A · Unlimited texts</div>
+        </label>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-next" onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Business Info -->
+    <div class="step-panel" id="step-2">
+      <div class="step-eyebrow">Business profile</div>
+      <h1 class="step-title">Tell us about<br/>your business</h1>
+      <p class="step-sub">This info powers your automations and trains the AI to answer customer questions.</p>
+      <div class="field">
+        <label>Business name <span>*</span></label>
+        <input type="text" id="businessName" placeholder="Mike's Plumbing" oninput="updatePreviews()"/>
+      </div>
+      <div class="field">
+        <label>Your email <span>*</span></label>
+        <input type="email" id="ownerEmail" placeholder="you@yourbusiness.com"/>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Your phone number <span>*</span></label>
+          <input type="tel" id="ownerPhone" placeholder="+15131234567"/>
+        </div>
+        <div class="field">
+          <label>Industry</label>
+          <select id="industry">
+            <option>HVAC</option><option>Plumbing</option><option>Electrical</option>
+            <option>Dental / Medical</option><option>Real Estate</option><option>Auto Repair</option>
+            <option>Landscaping</option><option>Roofing</option><option>Pest Control</option>
+            <option>Salon / Spa</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Services offered</label>
+        <textarea id="services" placeholder="Drain cleaning, water heater install/repair, leak detection, emergency plumbing..."></textarea>
+      </div>
+      <div class="field">
+        <label>Pricing &amp; offers</label>
+        <textarea id="pricing" placeholder="Free estimates. $49 diagnostic fee (waived with repair). Senior discount 10%." style="min-height:72px"></textarea>
+      </div>
+      <div class="field">
+        <label>Booking / scheduling URL</label>
+        <input type="url" id="bookingUrl" placeholder="https://yourbusiness.com/book" oninput="updatePreviews()"/>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-back" onclick="prevStep()">← Back</button>
+        <button class="btn btn-next" onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Missed Call Message -->
+    <div class="step-panel" id="step-3">
+      <div class="step-eyebrow">Auto-text setup</div>
+      <h1 class="step-title">Customize your<br/>missed call text</h1>
+      <p class="step-sub">This message fires within seconds every time someone calls and you can't pick up.</p>
+      <div class="field">
+        <label>Message template</label>
+        <div class="template-wrap">
+          <div class="template-editor">
+            <textarea id="missedCallTemplate" oninput="updateMissedPreview()">Hey! Sorry we missed your call at {business_name}. We'll get back to you ASAP — or reply here to chat now.{booking_line}</textarea>
+          </div>
+          <div class="template-vars">
+            <span class="var-pill" onclick="insertVar('{business_name}')">{business_name}</span>
+            <span class="var-pill" onclick="insertVar('{booking_url}')">{booking_url}</span>
+            <span class="var-pill" onclick="insertVar('{booking_line}')">{booking_line}</span>
+          </div>
+        </div>
+        <div class="preview-label">Preview</div>
+        <div class="sms-preview">
+          <div class="sms-bubble" id="missedPreview">Loading preview...</div>
+          <div class="sms-meta" id="missedCharCount">0 characters</div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>After-hours only?</label>
+          <select id="afterHoursOnly">
+            <option value="false">Send anytime (recommended)</option>
+            <option value="true">Only outside business hours</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Skip repeat callers?</label>
+          <select id="skipRepeat">
+            <option value="true">Yes — skip if texted within 24h</option>
+            <option value="false">No — always send</option>
+          </select>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-back" onclick="prevStep()">← Back</button>
+        <button class="btn btn-next" onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Business Hours -->
+    <div class="step-panel" id="step-4">
+      <div class="step-eyebrow">Business hours</div>
+      <h1 class="step-title">When are you<br/>open for business?</h1>
+      <p class="step-sub">Used to control after-hours rules and help the AI give accurate answers.</p>
+      <div class="field">
+        <label>Days you're open</label>
+        <div class="hours-grid" id="daysGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Opening time</label>
+          <select id="openHour">
+            <option value="6">6:00 AM</option><option value="7" selected>7:00 AM</option>
+            <option value="8">8:00 AM</option><option value="9">9:00 AM</option>
+            <option value="10">10:00 AM</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Closing time</label>
+          <select id="closeHour">
+            <option value="17">5:00 PM</option><option value="18" selected>6:00 PM</option>
+            <option value="19">7:00 PM</option><option value="20">8:00 PM</option>
+            <option value="21">9:00 PM</option>
+          </select>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-back" onclick="prevStep()">← Back</button>
+        <button class="btn btn-next" onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Follow-up Sequence (skip if Starter plan) -->
+    <div class="step-panel" id="step-5">
+      <div class="step-eyebrow">Follow-up sequence</div>
+      <h1 class="step-title">Set up your<br/>follow-up messages</h1>
+      <p class="step-sub">These go out automatically on a schedule. Edit the message and timing for each step.</p>
+      <div id="seqSteps">
+        <!-- Populated by JS -->
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-back" onclick="prevStep()">← Back</button>
+        <button class="btn btn-next" onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: AI Q&A (Pro plan only) or Review -->
+    <div class="step-panel" id="step-6">
+      <div class="step-eyebrow">AI knowledge base</div>
+      <h1 class="step-title">Train your<br/>AI assistant</h1>
+      <p class="step-sub">Add common questions and answers. The AI uses these to reply instantly to customer texts.</p>
+      <div id="qaPairs">
+        <!-- Populated by JS -->
+      </div>
+      <button class="add-qa-btn" onclick="addQA()">+ Add Q&amp;A pair</button>
+      <div class="nav-buttons">
+        <button class="btn btn-back" onclick="prevStep()">← Back</button>
+        <button class="btn btn-submit" onclick="submitOnboarding()">🚀 Launch ReachBot →</button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-panel" id="successPanel">
+      <div class="success-icon">✅</div>
+      <h1 class="success-title">You're live.</h1>
+      <p class="success-sub">ReachBot is active. Paste these URLs into Twilio and you're done.</p>
+
+      <div class="next-steps">
+        <h3>Your Twilio webhook URLs</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Go to console.twilio.com → Phone Numbers → your number → paste these in</p>
+
+        <div class="next-step-item" style="flex-direction:column;align-items:flex-start;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="next-step-num">V</div>
+            <span style="font-size:12px;color:var(--muted)">Voice — "A call comes in" → HTTP POST</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;width:100%">
+            <code id="webhookVoiceUrl" style="font-size:12px;flex:1;background:rgba(0,0,0,.3);padding:8px 12px;border-radius:6px;word-break:break-all">Loading...</code>
+            <button onclick="copyText('webhookVoiceUrl')" style="background:none;border:1px solid var(--border2);border-radius:6px;color:var(--muted);padding:6px 10px;cursor:pointer;font-size:12px;white-space:nowrap">Copy</button>
+          </div>
+        </div>
+
+        <div class="next-step-item" style="flex-direction:column;align-items:flex-start;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="next-step-num">S</div>
+            <span style="font-size:12px;color:var(--muted)">Messaging — "A message comes in" → HTTP POST</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;width:100%">
+            <code id="webhookSmsUrl" style="font-size:12px;flex:1;background:rgba(0,0,0,.3);padding:8px 12px;border-radius:6px;word-break:break-all">Loading...</code>
+            <button onclick="copyText('webhookSmsUrl')" style="background:none;border:1px solid var(--border2);border-radius:6px;color:var(--muted);padding:6px 10px;cursor:pointer;font-size:12px;white-space:nowrap">Copy</button>
+          </div>
+        </div>
+
+        <div class="next-step-item">
+          <div class="next-step-num">3</div>
+          <div>Call your Twilio number from another phone and hang up. You should get a text back within 10 seconds.</div>
+        </div>
+        <div class="next-step-item">
+          <div class="next-step-num">4</div>
+          <div>Check your phone — we just sent you a welcome text confirming you're live.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap">
+        <a href="dashboard.html" style="display:inline-block;background:var(--green);color:#000;font-family:var(--font-display);font-weight:700;font-size:14px;padding:12px 28px;border-radius:8px;text-decoration:none">Open dashboard →</a>
+        <a href="index.html" style="display:inline-block;background:transparent;color:var(--text);border:1px solid var(--border2);font-family:var(--font-display);font-weight:600;font-size:14px;padding:12px 28px;border-radius:8px;text-decoration:none">Back to home</a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const STEPS = [
+  { label: 'Choose a plan', desc: 'Starter, Growth, or Pro' },
+  { label: 'Business info', desc: 'Name, services, pricing' },
+  { label: 'Missed call text', desc: 'Customize your template' },
+  { label: 'Business hours', desc: 'When you\'re open' },
+  { label: 'Follow-up sequence', desc: 'Message timing & copy' },
+  { label: 'AI knowledge base', desc: 'Train your Q&A bot' },
+];
+
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let activeDays = [1,2,3,4,5,6]; // Mon–Sat default
+
+let currentStep = 1;
+const totalSteps = STEPS.length;
+
+// ── BUILD SIDEBAR ──
+function buildSidebar() {
+  const nav = document.getElementById('stepsNav');
+  nav.innerHTML = STEPS.map((s,i) => `
+    <div class="step-nav-item ${i+1===currentStep?'active':i+1<currentStep?'done':'inactive'}" onclick="goToStep(${i+1})">
+      <div class="step-circle">${i+1<currentStep?'✓':i+1}</div>
+      <div>
+        <div class="step-nav-label">${s.label}</div>
+        <div class="step-nav-desc">${s.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── BUILD DAYS GRID ──
+function buildDaysGrid() {
+  const grid = document.getElementById('daysGrid');
+  grid.innerHTML = DAYS.map((d,i) => `
+    <div class="day-toggle ${activeDays.includes(i)?'on':''}" onclick="toggleDay(${i})">
+      <div class="day-toggle-label">${d}</div>
+    </div>
+  `).join('');
+}
+
+function toggleDay(i) {
+  if (activeDays.includes(i)) {
+    activeDays = activeDays.filter(d=>d!==i);
+  } else {
+    activeDays.push(i);
+  }
+  buildDaysGrid();
+}
+
+// ── BUILD SEQUENCE STEPS ──
+const DEFAULT_SEQ = [
+  { delay: 0, label: 'Immediately', message: 'Hey {first_name}, this is {business_name}! You recently reached out — still interested? Reply YES or call us back.' },
+  { delay: 1440, label: '24 hours later', message: 'Just checking in, {first_name} — we\'d love to help. Any questions? Reply anytime.{booking_line}' },
+  { delay: 4320, label: '3 days later', message: 'Hi {first_name} — we\'re running a special this week. Want me to hold a spot for you? Just reply!' },
+  { delay: 10080, label: '7 days later', message: 'Last message from us, {first_name}. No worries if now\'s not the right time — just save our number for when you need us.' },
+];
+
+function buildSeqSteps() {
+  const container = document.getElementById('seqSteps');
+  container.innerHTML = DEFAULT_SEQ.map((s,i) => `
+    <div class="seq-step">
+      <div class="seq-num-badge">${i+1}</div>
+      <div class="seq-content">
+        <div class="seq-delay-row">
+          <select class="seq-delay-select" id="seqDelay${i}">
+            <option value="0" ${s.delay===0?'selected':''}>Immediately</option>
+            <option value="60" ${s.delay===60?'selected':''}>1 hour later</option>
+            <option value="1440" ${s.delay===1440?'selected':''}>24 hours later</option>
+            <option value="4320" ${s.delay===4320?'selected':''}>3 days later</option>
+            <option value="7200" ${s.delay===7200?'selected':''}>5 days later</option>
+            <option value="10080" ${s.delay===10080?'selected':''}>7 days later</option>
+          </select>
+        </div>
+        <textarea class="seq-textarea" id="seqMsg${i}">${s.message}</textarea>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Variables: {first_name} {business_name} {booking_line}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── BUILD QA PAIRS ──
+let qaPairs = [
+  { q: 'Do you offer same-day service?', a: 'Yes! Book online or reply here and we\'ll get someone out same day when available.' },
+  { q: 'How much does a water heater replacement cost?', a: 'Installs start around $800–$1,200 depending on the unit. We offer free estimates!' },
+  { q: 'Are you open on weekends?', a: '' },
+];
+
+function buildQA() {
+  const container = document.getElementById('qaPairs');
+  container.innerHTML = qaPairs.map((qa,i) => `
+    <div class="qa-item" id="qaItem${i}">
+      <button class="qa-del-btn" onclick="removeQA(${i})">×</button>
+      <div class="qa-q field" style="margin-bottom:8px">
+        <label style="font-size:11px">Customer question</label>
+        <input type="text" value="${qa.q}" placeholder="Do you offer same-day service?" oninput="qaPairs[${i}].q=this.value"/>
+      </div>
+      <div class="qa-a field" style="margin-bottom:0">
+        <label style="font-size:11px">Your answer (under 160 chars)</label>
+        <input type="text" value="${qa.a}" placeholder="Yes! Book online or call us..." oninput="qaPairs[${i}].a=this.value"/>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addQA() {
+  qaPairs.push({ q:'', a:'' });
+  buildQA();
+  // Focus the new input
+  const inputs = document.querySelectorAll('.qa-q input');
+  inputs[inputs.length-1]?.focus();
+}
+
+function removeQA(i) {
+  qaPairs.splice(i,1);
+  buildQA();
+}
+
+// ── PREVIEWS ──
+function updatePreviews() {
+  updateMissedPreview();
+}
+
+function updateMissedPreview() {
+  const tmpl = document.getElementById('missedCallTemplate')?.value || '';
+  const biz = document.getElementById('businessName')?.value || 'Your Business';
+  const url = document.getElementById('bookingUrl')?.value || '';
+  const bookingLine = url ? ` Book here: ${url}` : '';
+  const preview = tmpl
+    .replace(/{business_name}/g, biz)
+    .replace(/{booking_url}/g, url)
+    .replace(/{booking_line}/g, bookingLine);
+  const el = document.getElementById('missedPreview');
+  const cnt = document.getElementById('missedCharCount');
+  if(el) el.textContent = preview || 'Start typing your template...';
+  if(cnt) cnt.textContent = `${preview.length} characters`;
+}
+
+function insertVar(variable) {
+  const ta = document.getElementById('missedCallTemplate');
+  if(!ta) return;
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  ta.value = ta.value.slice(0, start) + variable + ta.value.slice(end);
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = start + variable.length;
+  updateMissedPreview();
+}
+
+// ── PLAN SELECTION ──
+document.querySelectorAll('.plan-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('.plan-option').forEach(o=>o.classList.remove('selected'));
+    opt.classList.add('selected');
+    opt.querySelector('input[type=radio]').checked = true;
+  });
+});
+
+// ── PROGRESS ──
+function updateProgress() {
+  const pct = Math.round((currentStep / totalSteps) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `Step ${currentStep} of ${totalSteps}`;
+  document.getElementById('progressPct').textContent = pct + '%';
+  buildSidebar();
+}
+
+// ── NAVIGATION ──
+function goToStep(n) {
+  if(n > currentStep) return; // can't jump ahead
+  if(n < 1) return;
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`step-${n}`)?.classList.add('active');
+  currentStep = n;
+  updateProgress();
+}
+
+function nextStep() {
+  if(currentStep >= totalSteps) return;
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+  currentStep++;
+  document.getElementById(`step-${currentStep}`)?.classList.add('active');
+  updateProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function prevStep() {
+  if(currentStep <= 1) return;
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+  currentStep--;
+  document.getElementById(`step-${currentStep}`)?.classList.add('active');
+  updateProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── SUBMIT ──
+// ── Set this to your Railway URL after deploying ──────────────────────────────
+const REACHBOT_API = window.REACHBOT_API || 'https://YOUR-APP.up.railway.app';
+
+async function submitOnboarding() {
+  const btn = document.querySelector('.btn-submit');
+  const originalText = btn.textContent;
+  btn.textContent = 'Launching...';
+  btn.disabled = true;
+
+  const config = {
+    plan: document.querySelector('input[name=plan]:checked')?.value || 'growth',
+    businessName: document.getElementById('businessName')?.value || '',
+    email: document.getElementById('ownerEmail')?.value || '',
+    ownerPhone: document.getElementById('ownerPhone')?.value || '',
+    industry: document.getElementById('industry')?.value || '',
+    services: document.getElementById('services')?.value || '',
+    pricing: document.getElementById('pricing')?.value || '',
+    bookingUrl: document.getElementById('bookingUrl')?.value || '',
+    missedCallTemplate: document.getElementById('missedCallTemplate')?.value || '',
+    afterHoursOnly: document.getElementById('afterHoursOnly')?.value === 'true',
+    skipRepeatCallers: document.getElementById('skipRepeat')?.value === 'true',
+    openHour: parseInt(document.getElementById('openHour')?.value || 7),
+    closeHour: parseInt(document.getElementById('closeHour')?.value || 18),
+    workDays: activeDays,
+    followUpSteps: DEFAULT_SEQ.map((_,i) => ({
+      delay: parseInt(document.getElementById(`seqDelay${i}`)?.value || 0),
+      message: document.getElementById(`seqMsg${i}`)?.value || '',
+    })),
+    qaKnowledge: qaPairs.filter(qa => qa.q && qa.a),
+  };
+
+  try {
+    const res = await fetch(`${REACHBOT_API}/api/onboard`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Server error ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    // Show success screen with real webhook URLs
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('successPanel').style.display = 'block';
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('progressLabel').textContent = 'Complete!';
+    document.getElementById('progressPct').textContent = '100%';
+
+    // Inject the live webhook URLs
+    const voiceEl = document.getElementById('webhookVoiceUrl');
+    const smsEl = document.getElementById('webhookSmsUrl');
+    if (voiceEl) voiceEl.textContent = data.webhookVoice || REACHBOT_API + '/webhook/missed-call';
+    if (smsEl) smsEl.textContent = data.webhookSms || REACHBOT_API + '/webhook/inbound-sms';
+
+  } catch (err) {
+    console.error('Onboard error:', err);
+    btn.textContent = '⚠ ' + err.message + ' — try again';
+    btn.disabled = false;
+    setTimeout(() => { btn.textContent = originalText; }, 4000);
+  }
+}
+
+// ── Copy helper ──
+function copyText(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    const btn = el.nextElementSibling;
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
+  });
+}
+
+// ── INIT ──
+buildSidebar();
+buildDaysGrid();
+buildSeqSteps();
+buildQA();
+updateMissedPreview();
+updateProgress();
+</script>
+</body>
+</html>

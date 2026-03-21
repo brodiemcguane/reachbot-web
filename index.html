@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ReachBot — Never Miss a Lead Again</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#060608;
+  --off:#0d0d10;
+  --card:#13131a;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --text:#f2f2f5;
+  --muted:#7a7a8c;
+  --dim:#3a3a4a;
+  --green:#00e5a0;
+  --green-dim:rgba(0,229,160,0.1);
+  --green-glow:rgba(0,229,160,0.25);
+  --amber:#f5c842;
+  --font-display:'Syne',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.6;overflow-x:hidden}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 5%;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(16px);background:rgba(6,6,8,0.85);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:var(--font-display);font-size:20px;font-weight:800;letter-spacing:-0.03em;color:var(--text)}
+.nav-logo span{color:var(--green)}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a{font-size:14px;color:var(--muted);text-decoration:none;transition:color .15s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--green);color:#000;font-family:var(--font-display);font-weight:700;font-size:13px;padding:9px 20px;border-radius:6px;text-decoration:none;transition:opacity .15s}
+.nav-cta:hover{opacity:.85}
+
+/* ── SECTIONS ── */
+section{padding:100px 5%}
+.container{max-width:1080px;margin:0 auto}
+
+/* ── HERO ── */
+.hero{padding-top:160px;padding-bottom:80px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;pointer-events:none}
+.hero-glow{position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:700px;height:500px;background:radial-gradient(ellipse,var(--green-glow) 0%,transparent 70%);opacity:.35}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,black 30%,transparent 100%)}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--green-dim);border:1px solid rgba(0,229,160,0.25);border-radius:100px;padding:6px 14px;font-size:13px;color:var(--green);font-weight:500;margin-bottom:28px}
+.hero-tag-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+h1{font-family:var(--font-display);font-size:clamp(44px,7vw,82px);font-weight:800;line-height:1.0;letter-spacing:-0.04em;margin-bottom:24px;max-width:800px}
+h1 em{font-style:normal;color:var(--green)}
+.hero-sub{font-size:clamp(16px,2vw,20px);color:var(--muted);max-width:540px;font-weight:300;line-height:1.7;margin-bottom:40px}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.btn-hero{font-family:var(--font-display);font-weight:700;font-size:15px;padding:14px 32px;border-radius:8px;text-decoration:none;transition:all .15s;display:inline-block}
+.btn-hero-primary{background:var(--green);color:#000}
+.btn-hero-primary:hover{transform:translateY(-1px);box-shadow:0 8px 32px var(--green-glow)}
+.btn-hero-ghost{background:transparent;color:var(--text);border:1px solid var(--border2)}
+.btn-hero-ghost:hover{border-color:var(--text);background:rgba(255,255,255,.04)}
+.hero-proof{font-size:13px;color:var(--muted);margin-top:18px}
+.hero-proof strong{color:var(--text)}
+
+/* ── TICKER ── */
+.ticker-wrap{padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;background:var(--off)}
+.ticker{display:flex;gap:0;animation:ticker 28s linear infinite;white-space:nowrap}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-item{font-family:var(--font-display);font-size:13px;font-weight:600;color:var(--muted);padding:0 40px;text-transform:uppercase;letter-spacing:.1em}
+.ticker-item span{color:var(--green);margin-right:12px}
+
+/* ── PROBLEM ── */
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.problem-label{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--green);margin-bottom:16px}
+.problem-grid h2{font-family:var(--font-display);font-size:clamp(30px,4vw,48px);font-weight:800;letter-spacing:-0.03em;line-height:1.15;margin-bottom:20px}
+.problem-grid p{color:var(--muted);font-size:17px;font-weight:300;line-height:1.8}
+.problem-stat-stack{display:flex;flex-direction:column;gap:16px}
+.problem-stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;position:relative;overflow:hidden}
+.problem-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.ps-red::before{background:linear-gradient(90deg,#ff5757,transparent)}
+.ps-amber::before{background:linear-gradient(90deg,var(--amber),transparent)}
+.ps-green::before{background:linear-gradient(90deg,var(--green),transparent)}
+.ps-num{font-family:var(--font-display);font-size:40px;font-weight:800;letter-spacing:-0.04em;margin-bottom:4px}
+.ps-red .ps-num{color:#ff5757}
+.ps-amber .ps-num{color:var(--amber)}
+.ps-green .ps-num{color:var(--green)}
+.ps-label{font-size:14px;color:var(--muted)}
+
+/* ── HOW IT WORKS ── */
+.how-header{text-align:center;margin-bottom:64px}
+.how-header h2{font-family:var(--font-display);font-size:clamp(28px,4vw,48px);font-weight:800;letter-spacing:-0.03em;margin-bottom:12px}
+.how-header p{color:var(--muted);font-size:17px;max-width:480px;margin:0 auto}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;position:relative}
+.step{background:var(--card);border:1px solid var(--border);padding:36px 32px;position:relative}
+.step:first-child{border-radius:12px 0 0 12px}
+.step:last-child{border-radius:0 12px 12px 0}
+.step-num{font-family:var(--font-display);font-size:48px;font-weight:800;color:var(--dim);line-height:1;margin-bottom:20px}
+.step-icon{width:48px;height:48px;border-radius:10px;background:var(--green-dim);border:1px solid rgba(0,229,160,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:22px}
+.step h3{font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:10px}
+.step p{color:var(--muted);font-size:14px;line-height:1.7}
+.step-arrow{position:absolute;right:-18px;top:50%;transform:translateY(-50%);width:36px;height:36px;background:var(--black);border:1px solid var(--border2);border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:2;color:var(--green);font-size:14px}
+.step:last-child .step-arrow{display:none}
+
+/* ── FEATURES ── */
+.features-header{text-align:center;margin-bottom:64px}
+.features-header h2{font-family:var(--font-display);font-size:clamp(28px,4vw,48px);font-weight:800;letter-spacing:-0.03em;margin-bottom:12px}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;transition:border-color .2s}
+.feat:hover{border-color:var(--border2)}
+.feat-icon{font-size:28px;margin-bottom:16px}
+.feat h3{font-family:var(--font-display);font-size:17px;font-weight:700;margin-bottom:8px}
+.feat p{font-size:14px;color:var(--muted);line-height:1.7}
+.feat-highlight{border-color:rgba(0,229,160,0.2);background:linear-gradient(135deg,var(--card),rgba(0,229,160,0.04))}
+
+/* ── SOCIAL PROOF ── */
+.proof-section{background:var(--off);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.testimonial{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px}
+.stars{color:var(--amber);font-size:14px;margin-bottom:14px;letter-spacing:2px}
+.testimonial blockquote{font-size:15px;line-height:1.7;color:var(--text);font-style:italic;font-weight:300;margin-bottom:18px}
+.testimonial-author{display:flex;align-items:center;gap:12px}
+.author-avatar{width:38px;height:38px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(0,229,160,0.2);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:13px;color:var(--green)}
+.author-name{font-size:14px;font-weight:500}
+.author-biz{font-size:12px;color:var(--muted)}
+
+/* ── PRICING ── */
+.pricing-header{text-align:center;margin-bottom:64px}
+.pricing-header h2{font-family:var(--font-display);font-size:clamp(28px,4vw,48px);font-weight:800;letter-spacing:-0.03em;margin-bottom:12px}
+.pricing-header p{color:var(--muted);font-size:17px}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:start}
+.price-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;position:relative}
+.price-card.featured{border-color:var(--green);background:linear-gradient(145deg,var(--card),rgba(0,229,160,0.04))}
+.price-popular{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--green);color:#000;font-family:var(--font-display);font-weight:700;font-size:11px;padding:4px 14px;border-radius:100px;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.price-tier{font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.price-featured .price-tier{color:var(--green)}
+.price-amount{font-family:var(--font-display);font-size:52px;font-weight:800;letter-spacing:-0.04em;line-height:1;margin-bottom:4px}
+.price-per{font-size:16px;font-weight:400;color:var(--muted)}
+.price-desc{font-size:14px;color:var(--muted);margin:14px 0 24px}
+.price-features{list-style:none;margin-bottom:28px}
+.price-features li{font-size:14px;color:var(--muted);padding:7px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.price-features li:last-child{border-bottom:none}
+.price-features li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}
+.price-cta{display:block;text-align:center;padding:12px;border-radius:8px;font-family:var(--font-display);font-weight:700;font-size:14px;text-decoration:none;transition:all .15s}
+.price-cta-ghost{border:1px solid var(--border2);color:var(--text)}
+.price-cta-ghost:hover{border-color:var(--text);background:rgba(255,255,255,.04)}
+.price-cta-primary{background:var(--green);color:#000}
+.price-cta-primary:hover{opacity:.88;transform:translateY(-1px)}
+
+/* ── INDUSTRIES ── */
+.industries{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:40px}
+.industry-pill{background:var(--card);border:1px solid var(--border);border-radius:100px;padding:8px 18px;font-size:13px;color:var(--muted)}
+
+/* ── CTA SECTION ── */
+.cta-section{background:linear-gradient(135deg,rgba(0,229,160,0.08),transparent);border-top:1px solid rgba(0,229,160,0.15);text-align:center}
+.cta-section h2{font-family:var(--font-display);font-size:clamp(32px,5vw,60px);font-weight:800;letter-spacing:-0.04em;margin-bottom:16px}
+.cta-section p{font-size:18px;color:var(--muted);max-width:480px;margin:0 auto 40px;font-weight:300}
+.cta-note{font-size:13px;color:var(--muted);margin-top:14px}
+
+/* ── FOOTER ── */
+footer{padding:40px 5%;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:var(--font-display);font-size:18px;font-weight:800;letter-spacing:-0.02em}
+.footer-logo span{color:var(--green)}
+footer p{font-size:13px;color:var(--muted)}
+
+/* ── ANIMATIONS ── */
+.fade-up{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .problem-grid,.steps,.feat-grid,.proof-grid,.pricing-grid{grid-template-columns:1fr}
+  .steps .step{border-radius:12px!important}
+  .step-arrow{display:none!important}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Reach<span>Bot</span></div>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="dashboard.html" style="font-size:14px;color:var(--muted);text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Dashboard</a><a href="onboarding.html" class="nav-cta">Get started →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-glow"></div>
+    <div class="hero-grid"></div>
+  </div>
+  <div class="container">
+    <div class="hero-tag"><span class="hero-tag-dot"></span> AI-powered SMS automation</div>
+    <h1>Every missed call<br/>is a <em>missed paycheck</em></h1>
+    <p class="hero-sub">ReachBot texts your customers the second you miss their call, follows up automatically, and answers questions 24/7 — so you never lose a lead to a competitor again.</p>
+    <div class="hero-actions">
+      <a href="onboarding.html" class="btn-hero btn-hero-primary">Start for free →</a>
+      <a href="#how" class="btn-hero btn-hero-ghost">See how it works</a>
+    </div>
+    <p class="hero-proof">Trusted by <strong>HVAC, plumbing, dental &amp; real estate</strong> businesses · Setup in 10 minutes</p>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span class="ticker-item"><span>◈</span>Missed call auto-text</span>
+    <span class="ticker-item"><span>◈</span>AI-powered Q&amp;A bot</span>
+    <span class="ticker-item"><span>◈</span>Lead follow-up sequences</span>
+    <span class="ticker-item"><span>◈</span>24/7 automation</span>
+    <span class="ticker-item"><span>◈</span>Twilio SMS integration</span>
+    <span class="ticker-item"><span>◈</span>Human handoff alerts</span>
+    <span class="ticker-item"><span>◈</span>Missed call auto-text</span>
+    <span class="ticker-item"><span>◈</span>AI-powered Q&amp;A bot</span>
+    <span class="ticker-item"><span>◈</span>Lead follow-up sequences</span>
+    <span class="ticker-item"><span>◈</span>24/7 automation</span>
+    <span class="ticker-item"><span>◈</span>Twilio SMS integration</span>
+    <span class="ticker-item"><span>◈</span>Human handoff alerts</span>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section>
+  <div class="container">
+    <div class="problem-grid fade-up">
+      <div>
+        <div class="problem-label">The problem</div>
+        <h2>Your phone rings.<br/>You can't answer.<br/>They call someone else.</h2>
+        <p>Small businesses lose thousands of dollars every month to missed calls that never get followed up. Customers don't leave voicemails — they Google the next option and book immediately.</p>
+      </div>
+      <div class="problem-stat-stack">
+        <div class="problem-stat ps-red">
+          <div class="ps-num">85%</div>
+          <div class="ps-label">of customers who can't reach a business won't call back</div>
+        </div>
+        <div class="problem-stat ps-amber">
+          <div class="ps-num">$300+</div>
+          <div class="ps-label">average job value lost per missed call for home services</div>
+        </div>
+        <div class="problem-stat ps-green">
+          <div class="ps-num">7×</div>
+          <div class="ps-label">more likely to qualify a lead if you respond within 5 minutes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" style="background:var(--off);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="how-header fade-up">
+      <div class="problem-label" style="text-align:center;margin-bottom:12px">How it works</div>
+      <h2>Set it up once.<br/>It runs forever.</h2>
+      <p>Three automations that activate the moment a customer tries to reach you</p>
+    </div>
+    <div class="steps fade-up">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-icon">📞</div>
+        <h3>Missed call detected</h3>
+        <p>A customer calls your number. You're busy, in a job, or it's after hours. The call goes unanswered.</p>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-icon">💬</div>
+        <h3>Auto-text fires instantly</h3>
+        <p>Within seconds, the caller gets a personalized text — apologizing, offering to help, and linking to your booking page.</p>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-icon">🤖</div>
+        <h3>AI closes the deal</h3>
+        <p>If they text back with questions, the AI answers using your business info — hours, pricing, services — and books the appointment.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="features-header fade-up">
+      <div class="problem-label" style="text-align:center;margin-bottom:12px">Features</div>
+      <h2>Everything you need.<br/>Nothing you don't.</h2>
+    </div>
+    <div class="feat-grid fade-up">
+      <div class="feat feat-highlight">
+        <div class="feat-icon">⚡</div>
+        <h3>Instant missed call text</h3>
+        <p>Fires within seconds of a missed call. Customizable template with your business name, tone, and booking link.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🔁</div>
+        <h3>Smart follow-up sequences</h3>
+        <p>4-step drip campaign over 7 days. Stops automatically the second a lead replies, books, or texts STOP.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🧠</div>
+        <h3>AI Q&amp;A bot</h3>
+        <p>Trained on your services, pricing, and hours. Answers customer questions 24/7. Escalates to you when unsure.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📊</div>
+        <h3>Live activity dashboard</h3>
+        <p>See every text sent, every reply received, and every lead converted in real time. Full visibility, always.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🛑</div>
+        <h3>TCPA-compliant opt-out</h3>
+        <p>Handles STOP, UNSUBSCRIBE, and all standard opt-out keywords automatically. Never text someone twice who said no.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🔔</div>
+        <h3>Human handoff alerts</h3>
+        <p>When the AI isn't confident, it flags the conversation and texts you directly so you can take over instantly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="proof-section">
+  <div class="container">
+    <div class="how-header fade-up" style="margin-bottom:48px">
+      <h2>Built for businesses that<br/>can't afford to miss a lead</h2>
+    </div>
+    <div class="proof-grid fade-up">
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <blockquote>"We were losing 8–10 calls a week that went straight to voicemail. ReachBot turned 4 of those into booked jobs in the first week alone. Paid for itself 10x over."</blockquote>
+        <div class="testimonial-author">
+          <div class="author-avatar">MT</div>
+          <div>
+            <div class="author-name">Mike T.</div>
+            <div class="author-biz">Owner, Tri-State Plumbing</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <blockquote>"My front desk was missing calls constantly during lunch. Now every missed call gets a text back in seconds. Patients love it and we've seen a 30% increase in new bookings."</blockquote>
+        <div class="testimonial-author">
+          <div class="author-avatar">DR</div>
+          <div>
+            <div class="author-name">Dr. Rivera</div>
+            <div class="author-biz">Riverside Dental Group</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <blockquote>"I'm in showings all day and can't always answer. The AI handles 90% of questions perfectly and just tells me when something needs a human touch. It's like having a receptionist."</blockquote>
+        <div class="testimonial-author">
+          <div class="author-avatar">SJ</div>
+          <div>
+            <div class="author-name">Sarah J.</div>
+            <div class="author-biz">Realtor, Coldwell Banker</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:40px">
+      <p style="color:var(--muted);font-size:14px;margin-bottom:16px">Works great for any service business</p>
+      <div class="industries">
+        <span class="industry-pill">🔧 HVAC</span>
+        <span class="industry-pill">🚿 Plumbing</span>
+        <span class="industry-pill">⚡ Electrical</span>
+        <span class="industry-pill">🦷 Dental</span>
+        <span class="industry-pill">🏠 Real Estate</span>
+        <span class="industry-pill">🚗 Auto Repair</span>
+        <span class="industry-pill">🌿 Landscaping</span>
+        <span class="industry-pill">🏗️ Roofing</span>
+        <span class="industry-pill">🐛 Pest Control</span>
+        <span class="industry-pill">💅 Salons</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="pricing-header fade-up">
+      <div class="problem-label" style="text-align:center;margin-bottom:12px">Pricing</div>
+      <h2>Simple, transparent pricing</h2>
+      <p>No setup fees. No long-term contracts. Cancel anytime.</p>
+    </div>
+    <div class="pricing-grid fade-up">
+      <div class="price-card">
+        <div class="price-tier">Starter</div>
+        <div class="price-amount">$197<span class="price-per">/mo</span></div>
+        <div class="price-desc">Perfect for getting started. Captures missed calls automatically.</div>
+        <ul class="price-features">
+          <li>Missed call auto-text</li>
+          <li>Custom message template</li>
+          <li>After-hours rules</li>
+          <li>Dedup protection</li>
+          <li>Activity dashboard</li>
+          <li>Up to 300 texts/mo</li>
+        </ul>
+        <a href="onboarding.html" class="price-cta price-cta-ghost">Get started</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-popular">Most popular</div>
+        <div class="price-tier" style="color:var(--green)">Growth</div>
+        <div class="price-amount">$397<span class="price-per">/mo</span></div>
+        <div class="price-desc">The full follow-up system. Turns leads into booked clients on autopilot.</div>
+        <ul class="price-features">
+          <li>Everything in Starter</li>
+          <li>4-step follow-up sequences</li>
+          <li>Smart stop conditions</li>
+          <li>Lead manager &amp; CRM</li>
+          <li>Up to 1,000 texts/mo</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="onboarding.html" class="price-cta price-cta-primary">Get started →</a>
+      </div>
+      <div class="price-card">
+        <div class="price-tier">Pro</div>
+        <div class="price-amount">$697<span class="price-per">/mo</span></div>
+        <div class="price-desc">The full AI stack. Your 24/7 virtual receptionist that never sleeps.</div>
+        <ul class="price-features">
+          <li>Everything in Growth</li>
+          <li>AI Q&amp;A auto-replies</li>
+          <li>Human handoff alerts</li>
+          <li>Custom knowledge base</li>
+          <li>Unlimited texts/mo</li>
+          <li>Dedicated onboarding</li>
+        </ul>
+        <a href="onboarding.html" class="price-cta price-cta-ghost">Get started</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container fade-up">
+    <h2>Your next job is<br/>trying to call you<br/><em style="color:var(--green)">right now.</em></h2>
+    <p>Set up ReachBot in 10 minutes and never lose a lead to voicemail again.</p>
+    <a href="onboarding.html" class="btn-hero btn-hero-primary" style="font-size:17px;padding:16px 40px">Start for free — 10 min setup →</a>
+    <p class="cta-note">No credit card required · Cancel anytime · Works with your existing phone number</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Reach<span>Bot</span></div>
+  <p>© 2026 ReachBot. AI SMS automation for small businesses.</p>
+  <p style="font-size:13px;color:var(--muted)">Built with Twilio + Anthropic Claude</p>
+</footer>
+
+<script>
+// Intersection observer for fade-up animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      // stagger children if it's a grid
+      e.target.querySelectorAll('.step, .feat, .testimonial, .price-card, .problem-stat').forEach((child, i) => {
+        child.style.transitionDelay = `${i * 80}ms`;
+        child.style.opacity = '0';
+        child.style.transform = 'translateY(18px)';
+        child.style.transition = 'opacity .5s ease, transform .5s ease';
+        setTimeout(() => {
+          child.style.opacity = '1';
+          child.style.transform = 'translateY(0)';
+        }, i * 80 + 50);
+      });
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
